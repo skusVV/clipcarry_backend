@@ -2,8 +2,9 @@ import { Response, Request } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { User } from '../models/user.model';
+import { TOKEN_KEY } from '../constants';
 
-const TOKEN_KEY = 'here_is_my_token';
+
 const EXPIRATION_TIME = '2h';
 
 export class AuthController {
