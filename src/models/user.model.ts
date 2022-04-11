@@ -16,7 +16,7 @@ export interface UserDoc extends mongoose.Document{
     token: string;
 }
 
-interface PostModel extends mongoose.Model<UserDoc> {
+interface UserModel extends mongoose.Model<UserDoc> {
     build(attrs: UserAttrs): UserDoc;
 }
 
@@ -46,6 +46,6 @@ userSchema.statics.build = (attrs: UserAttrs) => {
     return new User(attrs);
 }
 
-const User = mongoose.model<UserDoc, PostModel>('users', userSchema);
+const User = mongoose.model<UserDoc, UserModel>('users', userSchema);
 
 export { User };
