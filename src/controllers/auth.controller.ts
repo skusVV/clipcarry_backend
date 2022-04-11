@@ -4,7 +4,6 @@ import jwt from 'jsonwebtoken';
 import { User } from '../models/user.model';
 import { TOKEN_KEY } from '../constants';
 
-
 const EXPIRATION_TIME = '2h';
 
 export class AuthController {
@@ -21,7 +20,7 @@ export class AuthController {
 
             if (user && (await bcrypt.compare(password, user.password))) {
                 const token = jwt.sign(
-                    { user_id: user._id, email },
+                    { user_id: user._id, email, firstName: user.first_name, lastName: user.last_name },
                     TOKEN_KEY,
                     {
                         expiresIn: EXPIRATION_TIME,
@@ -64,7 +63,7 @@ export class AuthController {
 
             // Create token
             const token = jwt.sign(
-                { user_id: user._id, email },
+                { user_id: user._id, email, firstName: user.first_name, lastName: user.last_name },
                 TOKEN_KEY,
                 {
                     expiresIn: EXPIRATION_TIME,

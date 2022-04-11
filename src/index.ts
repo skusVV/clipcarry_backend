@@ -4,6 +4,7 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 
 import { authRoutes } from './routes/auth';
+import { userRoutes } from './routes/user';
 
 const MONGO_URI = 'mongodb://localhost:27017/clipcarry';
 const PORT = 3000;
@@ -13,6 +14,7 @@ app.use(cors());
 app.use(bodyParser.json())
 
 authRoutes(app);
+userRoutes(app);
 
 const init = async() => {
     try {

@@ -2,7 +2,7 @@ import { Response, Request, NextFunction } from 'express';
 const jwt = require("jsonwebtoken");
 import { TOKEN_KEY } from '../constants';
 
-export const verifyToken = (req: Request, res: Response, next: NextFunction) => {
+export const auth = (req: Request, res: Response, next: NextFunction) => {
     const token =
         req.body.token || req.query.token || req.headers["x-access-token"];
 
