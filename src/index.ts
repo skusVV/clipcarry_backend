@@ -7,7 +7,7 @@ import { authRoutes } from './routes/auth';
 import { userRoutes } from './routes/user';
 
 const MONGO_URI = 'mongodb://localhost:27017/clipcarry';
-const PORT = 3000;
+const PORT = 3001;
 const app: Express = express();
 
 app.use(cors());
