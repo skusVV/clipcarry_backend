@@ -2,9 +2,7 @@ import { Response, Request } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { User } from '../models/user.model';
-import { TOKEN_KEY } from '../constants';
-
-const EXPIRATION_TIME = '2h';
+import { TOKEN_KEY, EXPIRATION_TIME } from '../constants';
 
 export class AuthController {
 
@@ -29,7 +27,7 @@ export class AuthController {
 
                 user.token = token;
 
-                res.status(200).json(user);
+                return res.status(200).json(user);
             }
             res.status(400).send("Invalid Credentials");
         } catch (err) {
@@ -71,7 +69,7 @@ export class AuthController {
             );
             user.token = token;
 
-            res.status(201).json(user);
+            return res.status(201).json(user);
         } catch (err) {
             console.log(err);
         }
