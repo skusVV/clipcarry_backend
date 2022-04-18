@@ -9,7 +9,7 @@ export const templateRecordsRoutes = (app: any) => {
         return templateRecordController.createRecord(req, res)
     });
 
-    app.get('/api/template-records', auth, (req: Request, res: Response) => {
+    app.get('/api/template-records/:templateId', auth, (req: Request, res: Response) => {
         return templateRecordController.getRecords(req, res)
     });
 
