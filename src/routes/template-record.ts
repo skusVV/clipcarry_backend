@@ -13,13 +13,12 @@ export const templateRecordsRoutes = (app: any) => {
         return templateRecordController.getRecords(req, res)
     });
 
-    app.path('/api/template-records/:id', auth, (req: Request, res: Response) => {
+    app.patch('/api/template-records/:id', auth, (req: Request, res: Response) => {
         return templateRecordController.editRecord(req, res)
     });
 
     app.delete('/api/template-records/:id', auth, (req: Request, res: Response) => {
         return templateRecordController.removeRecord(req, res)
     });
-
 
 }

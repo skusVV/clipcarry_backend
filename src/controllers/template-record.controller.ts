@@ -25,7 +25,12 @@ export class TemplateRecordController {
     }
 
     async editRecord(req: Request, res: Response): Promise<any> {
-        return res.send({ok: 'edit'});
+        const { fields, include_url = '', include_data = '' } = req.body;
+        const { id } = req.params;
+
+        await TemplateRecord.updateOne({_id: id}, {fields, include_url, include_data});
+
+        return res.send({ok: 'Edited'});
     }
 
     async removeRecord(req: Request, res: Response): Promise<any> {

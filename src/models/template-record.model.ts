@@ -4,6 +4,7 @@ interface TemplateRecordField {
     value: string;
     field_id: string;
     field_type: string;
+    label: string;
 }
 
 interface TemplateRecordAttrs {
@@ -29,7 +30,8 @@ const templateRecordSchema = new mongoose.Schema<TemplateRecordDoc>({
     fields: [{
         value: String,
         field_id: String,
-        field_type: String
+        field_type: String,
+        label: String
     }],
     include_url: String,
     include_data: String
