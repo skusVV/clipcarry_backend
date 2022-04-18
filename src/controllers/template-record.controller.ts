@@ -29,6 +29,10 @@ export class TemplateRecordController {
     }
 
     async removeRecord(req: Request, res: Response): Promise<any> {
-        return res.send({ok: 'remove'});
+        const { id } = req.params;
+
+        await TemplateRecord.deleteOne({ _id: id });
+
+        return res.send({ok: 'removed'});
     }
 }
