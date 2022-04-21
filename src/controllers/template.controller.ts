@@ -24,6 +24,7 @@ export class TemplateController {
     }
 
     async deleteTemplate(req: Request, res: Response): Promise<any> {
+        // TODO should also remove all related records
         const { id } = req.params;
 
         await Template.deleteOne({ _id: id});
