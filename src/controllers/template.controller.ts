@@ -22,4 +22,12 @@ export class TemplateController {
 
         return res.send(templates || []);
     }
+
+    async deleteTemplate(req: Request, res: Response): Promise<any> {
+        const { id } = req.params;
+
+        await Template.deleteOne({ _id: id});
+
+        return res.send();
+    }
 }

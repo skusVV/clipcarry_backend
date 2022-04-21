@@ -12,4 +12,9 @@ export const templateRoutes = (app: any) => {
     app.post('/api/templates', auth, (req: Request, res: Response) => {
         return templateController.createTemplate(req, res)
     });
+
+    app.delete('/api/templates/:id', auth, (req: Request, res: Response) => {
+        return templateController.deleteTemplate(req, res)
+    });
+
 }
