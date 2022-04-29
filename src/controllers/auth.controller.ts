@@ -2,7 +2,19 @@ import { Response, Request } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { User } from '../models/user.model';
-import { TOKEN_KEY, EXPIRATION_TIME } from '../constants';
+import { TOKEN_KEY, EXPIRATION_TIME, DEFAULT_USER_EXPIRATION_TIME } from '../constants';
+
+function randomString() {
+    let result = '';
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const charactersLength = characters.length;
+    for ( let i = 0; i < 10; i++ ) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+}
+
+const GUEST_USER_PASSWORD = 'jhtu*4hns';
 
 export class AuthController {
 
@@ -18,7 +30,7 @@ export class AuthController {
 
             if (user && (await bcrypt.compare(password, user.password))) {
                 const token = jwt.sign(
-                    { user_id: user._id, email, firstName: user.first_name, lastName: user.last_name },
+                    { user_id: user._id, email },
                     TOKEN_KEY,
                     {
                         expiresIn: EXPIRATION_TIME,
@@ -52,24 +64,57 @@ export class AuthController {
 
             const encryptedPassword = await bcrypt.hash(password, 10);
 
+            // const user = await User.create({
+            //     first_name,
+            //     last_name,
+            //     email: email.toLowerCase(),
+            //     password: encryptedPassword,
+            // });
+            //
+            // // Create token
+            // const token = jwt.sign(
+            //     { user_id: user._id, email, firstName: user.first_name, lastName: user.last_name },
+            //     TOKEN_KEY,
+            //     {
+            //         expiresIn: EXPIRATION_TIME,
+            //     }
+            // );
+            // user.token = token;
+
+            return res.status(201).json({});
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+    async registerAsGuest(req: Request, res: Response): Promise<any> {
+        try {
+            const { checkWord } = req.body;
+
+            if (!checkWord || checkWord !== 'Clipcarry_check_symbol') {
+                res.status(400).send("Can't register as guest");
+            }
+
+            const encryptedPassword = await bcrypt.hash(GUEST_USER_PASSWORD, 10);
+
             const user = await User.create({
-                first_name,
-                last_name,
-                email: email.toLowerCase(),
+                email: randomString(),
                 password: encryptedPassword,
+                isGuest: true,
+                isPaid: false
             });
 
             // Create token
             const token = jwt.sign(
-                { user_id: user._id, email, firstName: user.first_name, lastName: user.last_name },
+                { user_id: user._id, isGuest: true, isPaid: false },
                 TOKEN_KEY,
                 {
-                    expiresIn: EXPIRATION_TIME,
+                    expiresIn: DEFAULT_USER_EXPIRATION_TIME,
                 }
             );
             user.token = token;
 
-            return res.status(201).json(user);
+            return res.status(201).json({ token, userGuid: user._id });
         } catch (err) {
             console.log(err);
         }

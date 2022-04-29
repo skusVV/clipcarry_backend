@@ -31,4 +31,22 @@ export class TemplateController {
 
         return res.send();
     }
+
+    async editTemplate(req: Request, res: Response): Promise<any> {
+        // TODO should also edit all related records
+        const { id } = req.params;
+
+        const result = await Template.updateOne({ _id: id},this.getUpdatedFields(req.body)); // req.body not the best choise
+
+        return res.send(result);
+    }
+
+    private getUpdatedFields(data:any): any {
+        return {
+            template_name: data.templateName,
+            include_url: data.includeUrl,
+            include_date: data.includeDate,
+            fields: data.fields.map((field: any) => ({label: field.label, fieldType: field.fieldType, xpath: field.xpath}))
+        }
+    }
 }

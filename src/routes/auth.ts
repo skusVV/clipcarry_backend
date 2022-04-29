@@ -11,4 +11,8 @@ export const authRoutes = (app: any) => {
     app.post('/api/register', (req: Request, res: Response) => {
         return authController.register(req, res)
     });
+
+    app.post('/api/register-as-guest', (req: Request, res: Response) => {
+        return authController.registerAsGuest(req, res)
+    });
 }

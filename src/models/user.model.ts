@@ -1,19 +1,23 @@
 import mongoose from 'mongoose';
 
 interface UserAttrs {
-    first_name: string;
-    last_name: string;
     email: string;
     password: string;
     token: string;
+    isGuest: boolean;
+    isPaid: boolean;
+    registerData: string;
+    paidDate: string;
 }
 
 export interface UserDoc extends mongoose.Document{
-    first_name: string;
-    last_name: string;
     email: string;
     password: string;
     token: string;
+    isGuest: boolean;
+    isPaid: boolean;
+    registerData: string;
+    paidDate: string;
 }
 
 interface UserModel extends mongoose.Model<UserDoc> {
@@ -21,8 +25,6 @@ interface UserModel extends mongoose.Model<UserDoc> {
 }
 
 const userSchema = new mongoose.Schema<UserDoc>({
-    first_name: String,
-    last_name: String,
     email: {
         type: String,
         unique: true
@@ -33,6 +35,14 @@ const userSchema = new mongoose.Schema<UserDoc>({
     token: {
         type: String
     },
+    isGuest: {
+        type: Boolean
+    },
+    isPaid: {
+        type: Boolean
+    },
+    registerData: String,
+    paidDate: String
 }, {
     toJSON: {
         transform(doc, ret) {

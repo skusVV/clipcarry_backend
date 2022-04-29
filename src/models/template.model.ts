@@ -11,6 +11,7 @@ interface TemplateAttrs {
     template_name: string;
     include_date: boolean;
     include_url: boolean;
+    isSample: boolean;
     fields: TemplateField[];
 }
 
@@ -19,6 +20,7 @@ export interface TemplateDoc extends mongoose.Document{
     template_name: string;
     include_date: boolean;
     include_url: boolean;
+    isSample: boolean;
     fields: TemplateField[];
 }
 
@@ -31,6 +33,10 @@ const templateSchema = new mongoose.Schema<TemplateDoc>({
     template_name: String,
     include_date: Boolean,
     include_url: Boolean,
+    isSample: {
+        type: Boolean,
+        default: false
+    },
     fields: [{
         label: String,
         fieldType: String,

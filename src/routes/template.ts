@@ -17,4 +17,8 @@ export const templateRoutes = (app: any) => {
         return templateController.deleteTemplate(req, res)
     });
 
+    app.patch('/api/templates/:id', auth, (req: Request, res: Response) => {
+        return templateController.editTemplate(req, res)
+    });
+
 }
