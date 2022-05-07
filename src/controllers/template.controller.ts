@@ -54,7 +54,7 @@ export class TemplateController {
     private getUpdatedFields(data:any): any {
         return {
             template_name: data.templateName,
-            fields: data.fields.map((field: any) => ({name: field.name, fieldType: field.fieldType, xpath: field.xpath}))
+            fields: data.fields.map((field: any) => ({name: field.name, fieldType: field.fieldType, xPath: field.xpath}))
         }
     }
 }

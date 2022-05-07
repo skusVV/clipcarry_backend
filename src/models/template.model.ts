@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 interface TemplateField {
     name: string;
     fieldType: string;
-    xpath: string;
+    xPath: string;
 }
 
 interface TemplateAttrs {
@@ -38,7 +38,7 @@ const templateSchema = new mongoose.Schema<TemplateDoc>({
     fields: [{
         name: String,
         fieldType: String,
-        xpath: String
+        xPath: String
     }],
     created_date: String,
     icon: String,
