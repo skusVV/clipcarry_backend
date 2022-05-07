@@ -9,6 +9,10 @@ export const templateRoutes = (app: any) => {
         return templateController.getUserTemplates(req, res)
     });
 
+    app.get('/api/templates/:id', auth, (req: Request, res: Response) => {
+        return templateController.getUserTemplateWithRecords(req, res)
+    });
+
     app.post('/api/templates', auth, (req: Request, res: Response) => {
         return templateController.createTemplate(req, res)
     });

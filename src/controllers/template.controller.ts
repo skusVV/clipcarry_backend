@@ -1,5 +1,6 @@
 import { Response, Request } from 'express';
 import { Template } from '../models/template.model';
+import { TemplateRecord } from '../models/template-record.model';
 
 export class TemplateController {
 
@@ -22,6 +23,14 @@ export class TemplateController {
         const templates = await Template.find({user_id: (req as any).user.user_id});
 
         return res.send(templates || []);
+    }
+
+    async getUserTemplateWithRecords(req: Request, res: Response): Promise<any> {
+        const { id } = req.params;
+        const template = await Template.findOne({ _id: id });
+        const records = await TemplateRecord.find({ template_id: id });
+
+        return res.send({...(template as any)._doc, records});
     }
 
     async deleteTemplate(req: Request, res: Response): Promise<any> {
