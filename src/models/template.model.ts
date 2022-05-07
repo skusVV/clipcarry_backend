@@ -12,6 +12,7 @@ interface TemplateAttrs {
     isSample: boolean;
     fields: TemplateField[];
     created_date: string;
+    icon: string;
 }
 
 export interface TemplateDoc extends mongoose.Document{
@@ -20,6 +21,7 @@ export interface TemplateDoc extends mongoose.Document{
     isSample: boolean;
     fields: TemplateField[];
     created_date: string;
+    icon: string;
 }
 
 interface TemplateModel extends mongoose.Model<TemplateDoc> {
@@ -39,6 +41,7 @@ const templateSchema = new mongoose.Schema<TemplateDoc>({
         xpath: String
     }],
     created_date: String,
+    icon: String,
 }, {
     toJSON: {
         transform(doc, ret) {

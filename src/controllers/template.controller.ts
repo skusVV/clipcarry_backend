@@ -4,12 +4,13 @@ import { Template } from '../models/template.model';
 export class TemplateController {
 
     async createTemplate(req: Request, res: Response): Promise<any> {
-        const { templateName, fields } = req.body;
+        const { templateName, fields, icon } = req.body;
         const template = new Template({
             template_name: templateName,
             user_id: (req as any).user.user_id,
             fields,
-            created_date: new Date().toLocaleDateString()
+            created_date: new Date().toLocaleDateString(),
+            icon
         });
 
         await template.save()
