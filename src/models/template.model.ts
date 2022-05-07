@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 interface TemplateField {
-    label: string;
+    name: string;
     fieldType: string;
     xpath: string;
 }
@@ -9,19 +9,17 @@ interface TemplateField {
 interface TemplateAttrs {
     user_id: string;
     template_name: string;
-    include_date: boolean;
-    include_url: boolean;
     isSample: boolean;
     fields: TemplateField[];
+    created_date: string;
 }
 
 export interface TemplateDoc extends mongoose.Document{
     user_id: string;
     template_name: string;
-    include_date: boolean;
-    include_url: boolean;
     isSample: boolean;
     fields: TemplateField[];
+    created_date: string;
 }
 
 interface TemplateModel extends mongoose.Model<TemplateDoc> {
@@ -31,17 +29,16 @@ interface TemplateModel extends mongoose.Model<TemplateDoc> {
 const templateSchema = new mongoose.Schema<TemplateDoc>({
     user_id: String,
     template_name: String,
-    include_date: Boolean,
-    include_url: Boolean,
     isSample: {
         type: Boolean,
         default: false
     },
     fields: [{
-        label: String,
+        name: String,
         fieldType: String,
         xpath: String
-    }]
+    }],
+    created_date: String,
 }, {
     toJSON: {
         transform(doc, ret) {

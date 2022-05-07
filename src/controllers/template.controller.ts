@@ -4,13 +4,13 @@ import { Template } from '../models/template.model';
 export class TemplateController {
 
     async createTemplate(req: Request, res: Response): Promise<any> {
-        const { templateName, includeDate, includeUrl, fields } = req.body;
+        const { templateName, fields } = req.body;
         const template = new Template({
             template_name: templateName,
-            include_date: includeDate,
-            include_url: includeUrl,
             user_id: (req as any).user.user_id,
-            fields });
+            fields,
+            created_date: new Date().toLocaleDateString()
+        });
 
         await template.save()
 
@@ -44,9 +44,7 @@ export class TemplateController {
     private getUpdatedFields(data:any): any {
         return {
             template_name: data.templateName,
-            include_url: data.includeUrl,
-            include_date: data.includeDate,
-            fields: data.fields.map((field: any) => ({label: field.label, fieldType: field.fieldType, xpath: field.xpath}))
+            fields: data.fields.map((field: any) => ({name: field.name, fieldType: field.fieldType, xpath: field.xpath}))
         }
     }
 }
