@@ -3,22 +3,18 @@ import mongoose from 'mongoose';
 interface TemplateRecordField {
     value: string;
     field_id: string;
-    field_type: string;
+    fieldType: string;
     name: string;
 }
 
 interface TemplateRecordAttrs {
     template_id: string;
     fields: TemplateRecordField[];
-    include_url: string;
-    include_data: string;
 }
 
 export interface TemplateRecordDoc extends mongoose.Document{
     template_id: string;
     fields: TemplateRecordField[];
-    include_url: string;
-    include_data: string;
 }
 
 interface TemplateRecordModel extends mongoose.Model<TemplateRecordDoc> {
@@ -30,11 +26,9 @@ const templateRecordSchema = new mongoose.Schema<TemplateRecordDoc>({
     fields: [{
         value: String,
         field_id: String,
-        field_type: String,
+        fieldType: String,
         name: String
     }],
-    include_url: String,
-    include_data: String
 }, {
     toJSON: {
         transform(doc, ret) {

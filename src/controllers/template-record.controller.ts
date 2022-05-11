@@ -4,13 +4,13 @@ import { TemplateRecord } from '../models/template-record.model';
 export class TemplateRecordController {
 
     async createRecord(req: Request, res: Response): Promise<any> {
-        const { fields, template_id, include_url = '', include_data = '' } = req.body;
+        const { fields, template_id } = req.body;
 
         if (!template_id || !fields || !fields.length) {
         //     Throw an error
             return  res.status(400).send('Something went wrong');
         }
-        const record = new TemplateRecord({fields, template_id, include_url, include_data });
+        const record = new TemplateRecord({fields, template_id });
 
         await record.save()
 
@@ -25,10 +25,10 @@ export class TemplateRecordController {
     }
 
     async editRecord(req: Request, res: Response): Promise<any> {
-        const { fields, include_url = '', include_data = '' } = req.body;
+        const { fields} = req.body;
         const { id } = req.params;
 
-        await TemplateRecord.updateOne({_id: id}, {fields, include_url, include_data});
+        await TemplateRecord.updateOne({_id: id}, {fields});
 
         return res.send({ok: 'Edited'});
     }
