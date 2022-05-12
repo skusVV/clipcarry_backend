@@ -6,12 +6,20 @@ export class TemplateController {
 
     async createTemplate(req: Request, res: Response): Promise<any> {
         const { templateName, fields, icon } = req.body;
+        const textFields = fields.filter((item: any) => item.fieldType !== 'Image');
+        const imgFields = fields.filter((item: any) => item.fieldType === 'Image');
+        const primaryField = textFields && textFields[0] && textFields[0].name; // Should be at least one field
+        const secondaryField = textFields && textFields[1] && textFields[1].name || '';
+        const entryLogo = imgFields && imgFields[0] && imgFields[0].name || '';
         const template = new Template({
             template_name: templateName,
             user_id: (req as any).user.user_id,
             fields,
             created_date: new Date().toLocaleDateString(),
-            icon
+            icon,
+            primaryField,
+            secondaryField,
+            entryLogo
         });
 
         await template.save()
