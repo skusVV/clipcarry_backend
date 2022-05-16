@@ -1,6 +1,9 @@
 import { Response, Request } from 'express';
 import { Template } from '../models/template.model';
 import { TemplateRecord } from '../models/template-record.model';
+import { generateRandomString } from '../utils';
+
+const SHARE_CODE_LENGTH = 8;
 
 export class TemplateController {
 
@@ -57,6 +60,52 @@ export class TemplateController {
         const result = await Template.updateOne({ _id: id},this.getUpdatedFields(req.body)); // req.body not the best choise
 
         return res.send(result);
+    }
+
+    async getTemplateShareCode(req: Request, res: Response): Promise<any> {
+        const { id } = req.params;
+
+        const template = await Template.findOne({ _id: id });
+
+        if (template && !template.shareCode) {
+            template.shareCode = generateRandomString(SHARE_CODE_LENGTH, true);
+            await template.save();
+        }
+
+        return res.send(template);
+    }
+
+    async importTemplateByShareCode(req: Request, res: Response): Promise<any> {
+        const { shareCode } = req.body;
+
+        if (!shareCode) {
+            return  res.status(400).send('Share code must be provided');
+        }
+
+        if (shareCode.length < SHARE_CODE_LENGTH) {
+            return  res.status(400).send('Please enter the correct code');
+        }
+
+        const template = await Template.findOne({ shareCode });
+
+        if (!template) {
+            return  res.status(400).send('Please enter the correct code');
+        }
+
+        const newTemplate = new Template({
+            template_name: template.template_name,
+            user_id: (req as any).user.user_id,
+            fields: template.fields,
+            created_date: new Date().toLocaleDateString(),
+            icon: template.icon,
+            primaryField: template.primaryField,
+            secondaryField: template.secondaryField,
+            entryLogo: template.entryLogo
+        });
+
+        await newTemplate.save();
+
+        return res.status(200).send(newTemplate);
     }
 
     private getUpdatedFields(data:any): any {
