@@ -16,6 +16,7 @@ interface TemplateAttrs {
     primaryField: string;
     secondaryField: string;
     entryLogo: string;
+    shareCode: string;
 }
 
 export interface TemplateDoc extends mongoose.Document{
@@ -28,6 +29,7 @@ export interface TemplateDoc extends mongoose.Document{
     primaryField: string;
     secondaryField: string;
     entryLogo: string;
+    shareCode: string;
 }
 
 interface TemplateModel extends mongoose.Model<TemplateDoc> {
@@ -51,6 +53,7 @@ const templateSchema = new mongoose.Schema<TemplateDoc>({
     primaryField: String,
     secondaryField: String,
     entryLogo: String,
+    shareCode: String
 }, {
     toJSON: {
         transform(doc, ret) {

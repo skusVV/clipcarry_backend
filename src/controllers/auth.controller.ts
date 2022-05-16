@@ -3,16 +3,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { User } from '../models/user.model';
 import { TOKEN_KEY, EXPIRATION_TIME, DEFAULT_USER_EXPIRATION_TIME } from '../constants';
-
-function randomString() {
-    let result = '';
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    const charactersLength = characters.length;
-    for ( let i = 0; i < 10; i++ ) {
-        result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    }
-    return result;
-}
+import { generateRandomString } from '../utils';
 
 const GUEST_USER_PASSWORD = 'jhtu*4hns';
 
@@ -98,7 +89,7 @@ export class AuthController {
             const encryptedPassword = await bcrypt.hash(GUEST_USER_PASSWORD, 10);
 
             const user = await User.create({
-                email: randomString(),
+                email: generateRandomString(),
                 password: encryptedPassword,
                 isGuest: true,
                 isPaid: false

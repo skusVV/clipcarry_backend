@@ -25,4 +25,12 @@ export const templateRoutes = (app: any) => {
         return templateController.editTemplate(req, res)
     });
 
+    app.get('/api/templates/share-code/:id', auth, (req: Request, res: Response) => {
+        return templateController.getTemplateShareCode(req, res);
+    });
+
+    app.post('/api/templates/import', auth, (req: Request, res: Response) => {
+        return templateController.importTemplateByShareCode(req, res);
+    });
+
 }
