@@ -45,10 +45,11 @@ export class TemplateController {
     }
 
     async deleteTemplate(req: Request, res: Response): Promise<any> {
-        // TODO should also remove all related records
         const { id } = req.params;
 
         await Template.deleteOne({ _id: id});
+
+        await TemplateRecord.deleteMany({ template_id: id });
 
         return res.send();
     }
@@ -57,7 +58,7 @@ export class TemplateController {
         // TODO should also edit all related records
         const { id } = req.params;
 
-        const result = await Template.updateOne({ _id: id},this.getUpdatedFields(req.body)); // req.body not the best choise
+        const result = await Template.updateOne({ _id: id }, this.getUpdatedFields(req.body)); // req.body not the best choise
 
         return res.send(result);
     }
@@ -108,10 +109,11 @@ export class TemplateController {
         return res.status(200).send(newTemplate);
     }
 
-    private getUpdatedFields(data:any): any {
+    private getUpdatedFields(data: any): any {
         return {
+            ...data, // not the best approach, but for now, should be fine
             template_name: data.templateName,
-            fields: data.fields.map((field: any) => ({name: field.name, fieldType: field.fieldType, xPath: field.xpath}))
+            fields: data.fields.map((field: any) => ({name: field.name, fieldType: field.fieldType, xPath: field.xPath}))
         }
     }
 }
