@@ -25,10 +25,10 @@ export class TemplateRecordController {
     }
 
     async editRecord(req: Request, res: Response): Promise<any> {
-        const { fields} = req.body;
+        const { fields } = req.body;
         const { id } = req.params;
 
-        await TemplateRecord.updateOne({_id: id}, {fields});
+        await TemplateRecord.updateOne({_id: id}, { fields });
 
         return res.send({ok: 'Edited'});
     }

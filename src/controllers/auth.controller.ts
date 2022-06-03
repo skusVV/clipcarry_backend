@@ -1,7 +1,7 @@
 import { Response, Request } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { User } from '../models/user.model';
+import { User, UserRoles } from '../models/user.model';
 import { TOKEN_KEY, EXPIRATION_TIME, DEFAULT_USER_EXPIRATION_TIME } from '../constants';
 import { generateRandomString } from '../utils';
 
@@ -21,7 +21,7 @@ export class AuthController {
 
             if (user && (await bcrypt.compare(password, user.password))) {
                 const token = jwt.sign(
-                    { user_id: user._id, email },
+                    { user_id: user._id, email, role: user.role },
                     TOKEN_KEY,
                     {
                         expiresIn: EXPIRATION_TIME,
@@ -41,9 +41,9 @@ export class AuthController {
 
     async register(req: Request, res: Response): Promise<any> {
         try {
-            const { first_name, last_name, email, password } = req.body;
+            const { firstName, lastName, email, password } = req.body;
 
-            if (!(email && password && first_name && last_name)) {
+            if (!(email && password && firstName && lastName)) {
                 res.status(400).send("All input is required");
             }
 
@@ -55,24 +55,25 @@ export class AuthController {
 
             const encryptedPassword = await bcrypt.hash(password, 10);
 
-            // const user = await User.create({
-            //     first_name,
-            //     last_name,
-            //     email: email.toLowerCase(),
-            //     password: encryptedPassword,
-            // });
-            //
-            // // Create token
-            // const token = jwt.sign(
-            //     { user_id: user._id, email, firstName: user.first_name, lastName: user.last_name },
-            //     TOKEN_KEY,
-            //     {
-            //         expiresIn: EXPIRATION_TIME,
-            //     }
-            // );
-            // user.token = token;
+            const user: any = await User.create({
+                firstName,
+                lastName,
+                email: email.toLowerCase(),
+                password: encryptedPassword,
+                role: UserRoles.USER
+            });
 
-            return res.status(201).json({});
+            // Create token
+            const token = jwt.sign(
+                { user_id: user._id, email, firstName: user.firstName, lastName: user.lastName, role: user.role },
+                TOKEN_KEY,
+                {
+                    expiresIn: EXPIRATION_TIME,
+                }
+            );
+            user.token = token;
+
+            return res.status(201).json({ token, userGuid: user._id });
         } catch (err) {
             console.log(err);
         }
@@ -91,13 +92,12 @@ export class AuthController {
             const user = await User.create({
                 email: generateRandomString(),
                 password: encryptedPassword,
-                isGuest: true,
-                isPaid: false
+                role: UserRoles.GUEST
             });
 
             // Create token
             const token = jwt.sign(
-                { user_id: user._id, isGuest: true, isPaid: false },
+                { user_id: user._id, role: user.role },
                 TOKEN_KEY,
                 {
                     expiresIn: DEFAULT_USER_EXPIRATION_TIME,
@@ -105,7 +105,17 @@ export class AuthController {
             );
             user.token = token;
 
-            return res.status(201).json({ token, userGuid: user._id });
+            return res.status(201).json({ token, userGuid: user._id, role: user.role });
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+    async getUserRole(req: Request, res: Response): Promise<any> {
+        try {
+            const user = (req as any).user;
+
+            return res.status(200).send({role: user.role});
         } catch (err) {
             console.log(err);
         }

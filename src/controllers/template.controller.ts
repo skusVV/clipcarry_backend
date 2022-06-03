@@ -57,10 +57,21 @@ export class TemplateController {
     async editTemplate(req: Request, res: Response): Promise<any> {
         // TODO should also edit all related records
         const { id } = req.params;
+        const { body } = req;
 
-        const result = await Template.updateOne({ _id: id }, this.getUpdatedFields(req.body)); // req.body not the best choise
+        const template = await Template.findOne({ _id: id });
 
-        return res.send(result);
+        if (template) {
+            const data = this.getUpdatedFields(body, template);
+
+            this.checkPreviewFields(data);
+
+            const result = await Template.updateOne({ _id: id }, data);
+
+            return res.status(200).send(result);
+        } else {
+            return res.status(404).send('Not found');
+        }
     }
 
     async getTemplateShareCode(req: Request, res: Response): Promise<any> {
@@ -109,11 +120,26 @@ export class TemplateController {
         return res.status(200).send(newTemplate);
     }
 
-    private getUpdatedFields(data: any): any {
+    private getUpdatedFields(updatedData: any, template: any): any {
+        const fields = updatedData.fields.map((field: any) => ({name: field.name, fieldType: field.fieldType, xPath: field.xPath}))
         return {
-            ...data, // not the best approach, but for now, should be fine
-            template_name: data.templateName,
-            fields: data.fields.map((field: any) => ({name: field.name, fieldType: field.fieldType, xPath: field.xPath}))
+            primaryField: updatedData.primaryField || template.primaryField,
+            secondaryField: updatedData.secondaryField || template.secondaryField,
+            entryLogo: updatedData.entryLogo || template.entryLogo,
+            template_name: updatedData.templateName || template.template_name,
+            fields: fields || template.fields,
         }
     }
+
+    private checkPreviewFields(data: any) {
+        const textFields = data.fields.filter((item: any) => item.fieldType !== 'Image');
+        const imgFields = data.fields.filter((item: any) => item.fieldType === 'Image');
+
+        data.primaryField = !textFields.find((field: any) => field.name === data.primaryField) ? textFields[0] && textFields[0].name : data.primaryField;
+        data.secondaryField = !textFields.find((field: any) => field.name === data.secondaryField) ? textFields[1] && textFields[1].name || '' : data.secondaryField;
+        data.entryLogo = !imgFields.find((field: any) => field.name === data.entryLogo) ? imgFields[0] && imgFields[0].name || '' : data.entryLogo;
+
+        return data;
+    }
+
 }
