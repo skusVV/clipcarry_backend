@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import { User, UserRoles } from '../models/user.model';
 import { TOKEN_KEY, EXPIRATION_TIME, DEFAULT_USER_EXPIRATION_TIME } from '../constants';
 import { generateRandomString } from '../utils';
+import { Template } from '../models/template.model';
 
 const GUEST_USER_PASSWORD = 'jhtu*4hns';
 
@@ -73,6 +74,8 @@ export class AuthController {
             );
             user.token = token;
 
+            await this.createSampleTemplate(user._id);
+
             return res.status(201).json({ token, userGuid: user._id });
         } catch (err) {
             console.log(err);
@@ -105,9 +108,37 @@ export class AuthController {
             );
             user.token = token;
 
+            await this.createSampleTemplate(user._id);
+
             return res.status(201).json({ token, userGuid: user._id, role: user.role });
         } catch (err) {
             console.log(err);
+        }
+    }
+
+    async createSampleTemplate(userId: any): Promise<void> {
+        const sampleDrafts = await Template.find({ isSampleDraft: true }, {
+            _id: 0,
+            isSampleDraft: 0,
+            __v: 0
+        });
+
+        if (sampleDrafts && sampleDrafts.length > 0) {
+            for (const sample of sampleDrafts) {
+                const template = new Template({
+                    template_name: sample.template_name,
+                    user_id: userId,
+                    fields: sample.fields,
+                    created_date: new Date().toLocaleDateString(),
+                    icon: sample.icon,
+                    primaryField: sample.primaryField,
+                    secondaryField: sample.secondaryField,
+                    entryLogo: sample.entryLogo,
+                    isSample: true
+                });
+
+                await template.save();
+            }
         }
     }
 

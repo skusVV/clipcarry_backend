@@ -7,6 +7,7 @@ import { authRoutes } from './routes/auth';
 import { userRoutes } from './routes/user';
 import { templateRoutes } from './routes/template';
 import { templateRecordsRoutes } from './routes/template-record';
+import { initSampleTemplates } from './models/template.model';
 
 const MONGO_URI = 'mongodb://localhost:27017/clipcarry';
 const PORT = 3001;
@@ -29,6 +30,8 @@ const init = async() => {
     } catch (e) {
         console.log(e);
     }
+
+    initSampleTemplates();
 
     app.listen(PORT, () => {
         console.log('Application started');

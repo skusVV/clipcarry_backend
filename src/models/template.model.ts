@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { SampleTemplates } from '../constants';
 
 interface TemplateField {
     name: string;
@@ -17,6 +18,7 @@ interface TemplateAttrs {
     secondaryField: string;
     entryLogo: string;
     shareCode: string;
+    isSampleDraft: boolean;
 }
 
 export interface TemplateDoc extends mongoose.Document{
@@ -30,6 +32,7 @@ export interface TemplateDoc extends mongoose.Document{
     secondaryField: string;
     entryLogo: string;
     shareCode: string;
+    isSampleDraft: boolean;
 }
 
 interface TemplateModel extends mongoose.Model<TemplateDoc> {
@@ -53,7 +56,8 @@ const templateSchema = new mongoose.Schema<TemplateDoc>({
     primaryField: String,
     secondaryField: String,
     entryLogo: String,
-    shareCode: String
+    shareCode: String,
+    isSampleDraft: Boolean
 }, {
     toJSON: {
         transform(doc, ret) {
@@ -68,5 +72,15 @@ templateSchema.statics.build = (attrs: TemplateAttrs) => {
 }
 
 const Template = mongoose.model<TemplateDoc, TemplateModel>('templates', templateSchema);
+
+export const initSampleTemplates = async () => {
+    const sampleDrafts = await Template.find({ isSampleDraft: true });
+
+    if (!sampleDrafts || !sampleDrafts.length) {
+        for (const template of SampleTemplates) {
+            await Template.create(template);
+        }
+    }
+};
 
 export { Template };
