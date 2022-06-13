@@ -22,7 +22,7 @@ export class AuthController {
 
             if (user && (await bcrypt.compare(password, user.password))) {
                 const token = jwt.sign(
-                    { user_id: user._id, email, role: user.role },
+                    { user_id: user._id, email, firstName: user.firstName, lastName: user.lastName, role: user.role },
                     TOKEN_KEY,
                     {
                         expiresIn: EXPIRATION_TIME,
@@ -42,7 +42,7 @@ export class AuthController {
 
     async register(req: Request, res: Response): Promise<any> {
         try {
-            const { firstName, lastName, email, password } = req.body;
+            const { firstName, lastName, email, password, userGuid } = req.body;
 
             if (!(email && password && firstName && lastName)) {
                 res.status(400).send("All input is required");
@@ -56,13 +56,26 @@ export class AuthController {
 
             const encryptedPassword = await bcrypt.hash(password, 10);
 
-            const user: any = await User.create({
-                firstName,
-                lastName,
-                email: email.toLowerCase(),
-                password: encryptedPassword,
-                role: UserRoles.USER
-            });
+            let user = await User.findOne({ _id: userGuid });
+            if (user) {
+                user.firstName = firstName;
+                user.lastName = lastName;
+                user.email = email.toLowerCase();
+                user.password = encryptedPassword;
+                user.role = UserRoles.USER;
+
+                user.save();
+            } else {
+                user = await User.create({
+                    firstName,
+                    lastName,
+                    email: email.toLowerCase(),
+                    password: encryptedPassword,
+                    role: UserRoles.USER
+                });
+
+                await this.createSampleTemplate(user._id);
+            }
 
             // Create token
             const token = jwt.sign(
@@ -74,9 +87,7 @@ export class AuthController {
             );
             user.token = token;
 
-            await this.createSampleTemplate(user._id);
-
-            return res.status(201).json({ token, userGuid: user._id });
+            return res.status(201).json({ token, userGuid: user._id, role: user.role });
         } catch (err) {
             console.log(err);
         }
