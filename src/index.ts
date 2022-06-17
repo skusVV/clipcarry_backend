@@ -8,6 +8,7 @@ import { userRoutes } from './routes/user';
 import { templateRoutes } from './routes/template';
 import { templateRecordsRoutes } from './routes/template-record';
 import { initSampleTemplates } from './models/template.model';
+import { stripeRoutes } from './routes/stripe';
 
 const MONGO_URI = 'mongodb://localhost:27017/clipcarry';
 const PORT = 3001;
@@ -19,6 +20,7 @@ app.use(bodyParser.json());
 authRoutes(app);
 userRoutes(app);
 templateRoutes(app);
+stripeRoutes(app);
 templateRecordsRoutes(app);
 
 const init = async() => {
