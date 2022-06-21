@@ -8,4 +8,8 @@ export const userRoutes = (app: any) => {
     app.get('/api/user', auth, (req: Request, res: Response) => {
         return userController.getUser(req, res)
     });
+
+    app.patch('/api/user/promote', auth, (req: Request, res: Response) => {
+        return userController.promoteUser(req, res);
+    });
 }

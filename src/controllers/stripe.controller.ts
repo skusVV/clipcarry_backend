@@ -1,5 +1,6 @@
 import { Response, Request } from 'express';
-const stripe = require("stripe")('{{ Paste your secret }}');
+import { configs } from '../config';
+const stripe = require("stripe")(configs.stripeSecret);
 
 export class StripeController {
 

@@ -2,11 +2,9 @@ import { Response, Request } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { User, UserRoles } from '../models/user.model';
-import { TOKEN_KEY, EXPIRATION_TIME, DEFAULT_USER_EXPIRATION_TIME } from '../constants';
 import { generateRandomString } from '../utils';
 import { Template } from '../models/template.model';
-
-const GUEST_USER_PASSWORD = 'jhtu*4hns';
+import { configs } from '../config';
 
 export class AuthController {
 
@@ -23,9 +21,9 @@ export class AuthController {
             if (user && (await bcrypt.compare(password, user.password))) {
                 const token = jwt.sign(
                     { user_id: user._id, email, firstName: user.firstName, lastName: user.lastName, role: user.role },
-                    TOKEN_KEY,
+                    configs.token.key,
                     {
-                        expiresIn: EXPIRATION_TIME,
+                        expiresIn: configs.token.expTime,
                     }
                 );
 
@@ -33,7 +31,7 @@ export class AuthController {
 
                 return res.status(200).json(user);
             }
-            res.status(400).send("Invalid Credentials");
+            res.status(400).send("Wrong password"); // A bit tricky, but it was Client requirement, so DILLIGAF
         } catch (err) {
             console.log(err);
         }
@@ -63,6 +61,7 @@ export class AuthController {
                 user.email = email.toLowerCase();
                 user.password = encryptedPassword;
                 user.role = UserRoles.USER;
+                user.registerData = new Date();
 
                 user.save();
             } else {
@@ -71,7 +70,8 @@ export class AuthController {
                     lastName,
                     email: email.toLowerCase(),
                     password: encryptedPassword,
-                    role: UserRoles.USER
+                    role: UserRoles.USER,
+                    registerData: new Date()
                 });
 
                 await this.createSampleTemplate(user._id);
@@ -80,9 +80,9 @@ export class AuthController {
             // Create token
             const token = jwt.sign(
                 { user_id: user._id, email, firstName: user.firstName, lastName: user.lastName, role: user.role },
-                TOKEN_KEY,
+                configs.token.key,
                 {
-                    expiresIn: EXPIRATION_TIME,
+                    expiresIn: configs.token.expTime,
                 }
             );
             user.token = token;
@@ -101,7 +101,7 @@ export class AuthController {
                 res.status(400).send("Can't register as guest");
             }
 
-            const encryptedPassword = await bcrypt.hash(GUEST_USER_PASSWORD, 10);
+            const encryptedPassword = await bcrypt.hash(configs.guestUserPassword, 10);
 
             const user = await User.create({
                 email: generateRandomString(),
@@ -112,9 +112,9 @@ export class AuthController {
             // Create token
             const token = jwt.sign(
                 { user_id: user._id, role: user.role },
-                TOKEN_KEY,
+                configs.token.key,
                 {
-                    expiresIn: DEFAULT_USER_EXPIRATION_TIME,
+                    expiresIn: configs.token.defaultExpTime,
                 }
             );
             user.token = token;

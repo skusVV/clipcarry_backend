@@ -9,9 +9,9 @@ import { templateRoutes } from './routes/template';
 import { templateRecordsRoutes } from './routes/template-record';
 import { initSampleTemplates } from './models/template.model';
 import { stripeRoutes } from './routes/stripe';
+import { configs } from './config';
+import startJobs from './tasks';
 
-const MONGO_URI = 'mongodb://localhost:27017/clipcarry';
-const PORT = 3001;
 const app: Express = express();
 
 app.use(cors());
@@ -23,9 +23,9 @@ templateRoutes(app);
 stripeRoutes(app);
 templateRecordsRoutes(app);
 
-const init = async() => {
+const init = async () => {
     try {
-        await mongoose.connect(MONGO_URI, {
+        await mongoose.connect(configs.mongoURI, {
             useUnifiedTopology: true
         } as {});
         console.log('Connected');
@@ -34,8 +34,9 @@ const init = async() => {
     }
 
     initSampleTemplates();
+    startJobs();
 
-    app.listen(PORT, () => {
+    app.listen(configs.port, () => {
         console.log('Application started');
     });
 };

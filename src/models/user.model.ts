@@ -4,22 +4,24 @@ interface UserAttrs {
     email: string;
     password: string;
     token: string;
-    registerData: string;
-    paidDate: string;
+    registerData: Date;
+    paidDate: Date;
     firstName: string;
     lastName: string;
     role: UserRoles;
+    createdDate: Date;
 }
 
 export interface UserDoc extends mongoose.Document{
     email: string;
     password: string;
     token: string;
-    registerData: string;
-    paidDate: string;
+    registerData: Date;
+    paidDate: Date;
     firstName: string;
     lastName: string;
     role: UserRoles;
+    createdDate: Date;
 }
 
 interface UserModel extends mongoose.Model<UserDoc> {
@@ -53,8 +55,12 @@ const userSchema = new mongoose.Schema<UserDoc>({
         type: String,
         enum: UserRoles
     },
-    registerData: String,
-    paidDate: String
+    createdDate: {
+        type: Date,
+        default: new Date()
+    },
+    registerData: Date,
+    paidDate: Date
 }, {
     toJSON: {
         transform(doc, ret) {
