@@ -20,5 +20,6 @@ export const configs: IConfigs = {
     defaultExpTime: process.env.DEFAULT_USER_EXPIRATION_TIME || '',
   },
 
-  guestUserPassword: process.env.GUEST_USER_PASSWORD || ''
+  guestUserPassword: process.env.GUEST_USER_PASSWORD || '',
+  registrationPromoCode: process.env.REGISTRATION_PROMOCODE || ''
 };

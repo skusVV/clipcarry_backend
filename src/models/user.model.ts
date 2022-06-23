@@ -5,7 +5,8 @@ interface UserAttrs {
     password: string;
     token: string;
     registerData: Date;
-    paidDate: Date;
+    paymentDate: Date;
+    paymentExpirationDate: Date;
     firstName: string;
     lastName: string;
     role: UserRoles;
@@ -17,7 +18,8 @@ export interface UserDoc extends mongoose.Document{
     password: string;
     token: string;
     registerData: Date;
-    paidDate: Date;
+    paymentDate: Date;
+    paymentExpirationDate: Date;
     firstName: string;
     lastName: string;
     role: UserRoles;
@@ -60,7 +62,8 @@ const userSchema = new mongoose.Schema<UserDoc>({
         default: new Date()
     },
     registerData: Date,
-    paidDate: Date
+    paymentDate: Date,
+    paymentExpirationDate: Date
 }, {
     toJSON: {
         transform(doc, ret) {

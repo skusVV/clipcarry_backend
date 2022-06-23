@@ -11,4 +11,5 @@ export interface IConfigs {
   };
 
   guestUserPassword: string;
+  registrationPromoCode: string;
 }

@@ -1,10 +1,11 @@
 import { Response, Request } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { User, UserRoles } from '../models/user.model';
+import { User, UserRoles, UserDoc} from '../models/user.model';
 import { generateRandomString } from '../utils';
 import { Template } from '../models/template.model';
 import { configs } from '../config';
+import moment from 'moment';
 
 export class AuthController {
 
@@ -20,7 +21,7 @@ export class AuthController {
 
             if (user && (await bcrypt.compare(password, user.password))) {
                 const token = jwt.sign(
-                    { user_id: user._id, email, firstName: user.firstName, lastName: user.lastName, role: user.role },
+                    { user_id: user._id, role: user.role },
                     configs.token.key,
                     {
                         expiresIn: configs.token.expTime,
@@ -40,7 +41,7 @@ export class AuthController {
 
     async register(req: Request, res: Response): Promise<any> {
         try {
-            const { firstName, lastName, email, password, userGuid } = req.body;
+            const { firstName, lastName, email, password, userGuid, promoCode } = req.body;
 
             if (!(email && password && firstName && lastName)) {
                 res.status(400).send("All input is required");
@@ -63,9 +64,9 @@ export class AuthController {
                 user.role = UserRoles.USER;
                 user.registerData = new Date();
 
-                user.save();
+                await user.save();
             } else {
-                user = await User.create({
+                user = new User({
                     firstName,
                     lastName,
                     email: email.toLowerCase(),
@@ -74,12 +75,18 @@ export class AuthController {
                     registerData: new Date()
                 });
 
+                await user.save();
+
                 await this.createSampleTemplate(user._id);
+            }
+
+            if (promoCode) {
+                await this.applyPromoCode(user, promoCode);
             }
 
             // Create token
             const token = jwt.sign(
-                { user_id: user._id, email, firstName: user.firstName, lastName: user.lastName, role: user.role },
+                { user_id: user._id, role: user.role },
                 configs.token.key,
                 {
                     expiresIn: configs.token.expTime,
@@ -150,6 +157,16 @@ export class AuthController {
 
                 await template.save();
             }
+        }
+    }
+
+    async applyPromoCode(user: UserDoc, promoCode = '') {
+        if (configs.registrationPromoCode && promoCode === configs.registrationPromoCode) {
+            user.role = UserRoles.PAID_USER;
+            user.paymentDate = new Date();
+            user.paymentExpirationDate = moment().add(1, 'years').toDate();
+
+            await user.save();
         }
     }
 

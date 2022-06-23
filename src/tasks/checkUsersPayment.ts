@@ -6,11 +6,11 @@ import cron from 'node-cron';
   // Every day an midnight
   cron.schedule('0 0 * * *', async () =>  {
     try {
-      const month = moment().subtract('30', 'days');
+      const today = moment();
 
       const usersToUpdate = await User.find({
         role: UserRoles.PAID_USER,
-        paidDate: { $exists: true, $lt: month }
+        paymentExpirationDate: { $exists: true, $lt: today }
       });
 
       while (usersToUpdate.length > 0) {
