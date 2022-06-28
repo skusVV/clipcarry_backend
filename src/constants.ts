@@ -23,7 +23,7 @@ export const SampleTemplates = [
         {
             "name" : "About",
             "fieldType" : "Long Field",
-            "xPath" : "//div[2]/div/div/main/section[5]/div[3]/div/div/div/span[1]",
+            "xPath" : "//div/div[2]/div/div/main/*/div[3]/div/div/div/span",
         }
     ],
     "icon" : "https://static-exp1.licdn.com/sc/h/akt4ae504epesldzj74dzred8",
