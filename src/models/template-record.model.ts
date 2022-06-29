@@ -10,11 +10,15 @@ interface TemplateRecordField {
 interface TemplateRecordAttrs {
     template_id: string;
     fields: TemplateRecordField[];
+    createdDate: Date;
+    profileUrl: string;
 }
 
 export interface TemplateRecordDoc extends mongoose.Document{
     template_id: string;
     fields: TemplateRecordField[];
+    createdDate: Date;
+    profileUrl: string;
 }
 
 interface TemplateRecordModel extends mongoose.Model<TemplateRecordDoc> {
@@ -29,6 +33,11 @@ const templateRecordSchema = new mongoose.Schema<TemplateRecordDoc>({
         fieldType: String,
         name: String
     }],
+    profileUrl: String,
+    createdDate: {
+        type: Date,
+        default: new Date()
+    }
 }, {
     toJSON: {
         transform(doc, ret) {

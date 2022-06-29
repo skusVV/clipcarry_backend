@@ -174,7 +174,32 @@ export class AuthController {
         try {
             const user = (req as any).user;
 
-            return res.status(200).send({role: user.role});
+            return res.status(201).send({role: user.role});
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+    async refreshUserToken(req: Request, res: Response): Promise<any> {
+        try {
+            const { user_id } = (req as any).user;
+
+            const user = await User.findById(user_id);
+
+            if (!user) {
+                return res.status(404).send("Not found");
+            }
+
+            const token = jwt.sign(
+                { user_id: user._id, role: user.role },
+                configs.token.key,
+                {
+                    expiresIn: configs.token.defaultExpTime,
+                }
+            );
+            user.token = token;
+
+            res.status(200).send(user);
         } catch (err) {
             console.log(err);
         }

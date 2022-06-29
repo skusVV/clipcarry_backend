@@ -4,15 +4,15 @@ import { TemplateRecord } from '../models/template-record.model';
 export class TemplateRecordController {
 
     async createRecord(req: Request, res: Response): Promise<any> {
-        const { fields, template_id } = req.body;
+        const { fields, template_id, profileUrl } = req.body;
 
         if (!template_id || !fields || !fields.length) {
         //     Throw an error
             return  res.status(400).send('Something went wrong');
         }
-        const record = new TemplateRecord({fields, template_id });
+        const record = new TemplateRecord({ fields, template_id, profileUrl, createdDate: new Date() });
 
-        await record.save()
+        await record.save();
 
         return res.send(record);
     }

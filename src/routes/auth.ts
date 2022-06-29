@@ -20,4 +20,8 @@ export const authRoutes = (app: any) => {
     app.get('/api/user-role', auth, (req: Request, res: Response) => {
         return authController.getUserRole(req, res);
     });
+
+    app.post('/api/refresh-token', auth, (req: Request, res: Response) => {
+        return authController.refreshUserToken(req, res);
+    })
 }
