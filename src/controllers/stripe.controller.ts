@@ -12,7 +12,8 @@ export class StripeController {
         currency: "usd",
         automatic_payment_methods: {
           enabled: true,
-        }
+        },
+        description: 'Clipcarry'
       });
 
       res.send({
