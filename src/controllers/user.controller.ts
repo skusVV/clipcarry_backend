@@ -3,6 +3,8 @@ import { User, UserRoles } from '../models/user.model';
 import jwt from 'jsonwebtoken';
 import { configs } from '../config';
 import moment from 'moment';
+import { StripeController } from './stripe.controller';
+const stripeController = new StripeController();
 
 export class UserController {
 
@@ -21,7 +23,8 @@ export class UserController {
                 lastName: user.lastName,
                 role: user.role,
                 userGuid: user_id,
-                paymentExpirationDate: user.paymentExpirationDate || ''
+                paymentExpirationDate: user.paymentExpirationDate || '',
+                customerId: user.customerId || ''
             });
         } catch (err) {
             console.log(err);
@@ -32,6 +35,11 @@ export class UserController {
     async promoteUser(req: Request, res: Response): Promise<any> {
         try {
             const { user_id } = (req as any).user;
+            const { session_id } = req.body;
+
+            if (!session_id) {
+                return res.status(400).send('Payment session_id is required');
+            }
             const user = await User.findById(user_id);
 
             if (!user) {
@@ -42,13 +50,25 @@ export class UserController {
                 return res.status(400).send('User already promoted');
             }
 
+            const session = await stripeController.getSession(session_id);
+
+            if (!session) {
+                return res.status(400).send('Bad session token');
+            }
+
             user.role = UserRoles.PAID_USER;
+            user.customerId = session.customer;
+            user.subscriptionId = session.subscription;
+
+            const subscription = await stripeController.getSubscription(session.subscription);
 
             if (!user.paymentDate) {
                 user.paymentDate = new Date();
             }
 
-            user.paymentExpirationDate = moment().add(30, 'days').toDate();
+            // Stripe is using UNIX timestamp notation which means setting time in SECONDS
+            // thats why we need to multiply it on 1000
+            user.paymentExpirationDate = moment(subscription.current_period_end * 1000).toDate();
 
             await user.save();
 

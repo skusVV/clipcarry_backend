@@ -6,6 +6,7 @@ import { generateRandomString } from '../utils';
 import { Template } from '../models/template.model';
 import { configs } from '../config';
 import moment from 'moment';
+import { PROMO_USER_SUB_ID } from '../constants';
 
 export class AuthController {
 
@@ -165,6 +166,7 @@ export class AuthController {
             user.role = UserRoles.PAID_USER;
             user.paymentDate = new Date();
             user.paymentExpirationDate = moment().add(1, 'years').toDate();
+            user.subscriptionId = PROMO_USER_SUB_ID;
 
             await user.save();
         }

@@ -9,15 +9,11 @@ export const stripeRoutes = (app: any) => {
         return stripeController.createPaymentIntent(req, res)
     });
 
-    app.get('/api/create-payment', (req: Request, res: Response) => {
+    app.get('/api/create-payment', auth, (req: Request, res: Response) => {
         return stripeController.createPayment(req, res)
     });
 
-    app.get('/api/getUser', (req: Request, res: Response) => {
-        return stripeController.getUser(req, res)
-    });
-
-    app.get('/api/getPortal', (req: Request, res: Response) => {
+    app.get('/api/create-portal', auth, (req: Request, res: Response) => {
         return stripeController.getPortal(req, res)
     });
 }

@@ -32,3 +32,5 @@ export const SampleTemplates = [
     "entryLogo" : "Photo",
   }
 ];
+
+export const PROMO_USER_SUB_ID = 'promo_user_subscription_id';

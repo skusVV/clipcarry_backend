@@ -1,5 +1,6 @@
 import { Response, Request } from 'express';
 import { configs } from '../config';
+import { User } from '../models/user.model';
 const stripe = require("stripe")(configs.stripeSecret);
 
 export class StripeController {
@@ -22,37 +23,72 @@ export class StripeController {
     }
 
     async createPayment(req: any, res: any) {
-      const paymentLink = await stripe.paymentLinks.create({
-        line_items: [
-            {price: 'price_1LGl8QGc8jl8Z4Cc7tHGq6ec', quantity: 1}
-        ],
-        after_completion: {type: 'redirect', redirect: {url: 'http://localhost:3000/payment-success?session_id={CHECKOUT_SESSION_ID}'}},
-      });
+      try {
+        const { user_id } = (req as any).user;
 
-      res.send({
-        paymentLink: {
-          ...paymentLink,
-          url: paymentLink.url + '?prefilled_email=skus000@gmail.com'
+        const user = await User.findById(user_id);
+
+        if (!user || !user.email) {
+          return res.status(404).send('User not found');
         }
-      });
+
+        if (user.subscriptionId) {
+          const subscription = await this.getSubscription(user.subscriptionId);
+
+          // needs to prove this concept
+          if (subscription && subscription.status === 'active') {
+            return res.status(200).send({ exist: true });
+          }
+        }
+
+        const paymentLink = await stripe.paymentLinks.create({
+          line_items: [
+              { price: configs.stripeProductPrice, quantity: 1 }
+          ],
+          after_completion: { type: 'redirect', redirect: { url: `${configs.landingUrl}/payment-success?session_id={CHECKOUT_SESSION_ID}` } },
+        });
+
+        res.send({
+          paymentLink: {
+            ...paymentLink,
+            url: paymentLink.url + `?prefilled_email=${user.email}`
+          }
+        });
+      } catch (error) {
+        console.log(error);
+        return res.status(500).send('Server Error');
+      }
+
     }
 
-  async getUser(req: any, res: any) {
-      const sessionId = 'cs_test_a174htDOMUffd6JnVKMt9mMw8MDuTQkXcjzCgxmshNLLvKvB76wxjiMGY0';
-
-    const session = await stripe.checkout.sessions.retrieve(
+  async getSession(sessionId: string) {
+    return stripe.checkout.sessions.retrieve(
         sessionId
     );
-    //     "customer": "cus_LyitSYfO5mXTja",
-    res.send({
-      session
-    });
+  }
+
+  async getSubscription(subId: string) {
+    return stripe.subscriptions.retrieve(subId);
   }
 
   async getPortal(req: any, res: any) {
+    const { user_id } = (req as any).user;
+
+    const user = await User.findById(user_id);
+
+    if (!user) {
+      return res.status(404).send('User not found');
+    }
+
+    const customerId = user.customerId;
+
+    if (!customerId) {
+      return res.status(400).send('User has no Customer Id');
+    }
+
     const portal = await stripe.billingPortal.sessions.create({
-      customer: 'cus_LyjCvgNL33pffr',
-      return_url: 'http://localhost:3000/',
+      customer: customerId,
+      return_url: configs.landingUrl,
     });
 
     res.send({

@@ -10,6 +10,8 @@ interface UserAttrs {
     firstName: string;
     lastName: string;
     role: UserRoles;
+    customerId: string;
+    subscriptionId: string;
     createdDate: Date;
 }
 
@@ -23,6 +25,8 @@ export interface UserDoc extends mongoose.Document{
     firstName: string;
     lastName: string;
     role: UserRoles;
+    customerId: string;
+    subscriptionId: string;
     createdDate: Date;
 }
 
@@ -61,6 +65,8 @@ const userSchema = new mongoose.Schema<UserDoc>({
         type: Date,
         default: new Date()
     },
+    customerId: String,
+    subscriptionId: String,
     registerData: Date,
     paymentDate: Date,
     paymentExpirationDate: Date

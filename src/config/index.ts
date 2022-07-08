@@ -12,7 +12,7 @@ export const configs: IConfigs = {
   port: Number(process.env.PORT) || 3001,
   mongoURI: process.env.MONGO_URI || '',
   stripeSecret: process.env.STRIPE_SECRET || '',
-  agendaCollection: process.env.AGENDA_COLLECTION_NAME || '',
+  stripeProductPrice: process.env.STRIPE_PRODUCT_PRICE || '',
 
   token: {
     key: process.env.TOKEN_KEY || '',
@@ -21,5 +21,6 @@ export const configs: IConfigs = {
   },
 
   guestUserPassword: process.env.GUEST_USER_PASSWORD || '',
-  registrationPromoCode: process.env.REGISTRATION_PROMOCODE || ''
+  registrationPromoCode: process.env.REGISTRATION_PROMOCODE || '',
+  landingUrl: process.env.LANDING_URL || ''
 };
