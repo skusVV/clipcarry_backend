@@ -2,7 +2,7 @@ export interface IConfigs {
   port: number;
   mongoURI: string;
   stripeSecret: string;
-  agendaCollection: string;
+  stripeProductPrice: string;
 
   token: {
     key: string;
@@ -12,4 +12,5 @@ export interface IConfigs {
 
   guestUserPassword: string;
   registrationPromoCode: string;
+  landingUrl: string;
 }
