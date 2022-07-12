@@ -13,6 +13,11 @@ interface UserAttrs {
     customerId: string;
     subscriptionId: string;
     createdDate: Date;
+    confirm_codes: [{
+        typeOfCode: ConfirmCodeTypes,
+        value: string,
+        expires_at: Date
+    }];
 }
 
 export interface UserDoc extends mongoose.Document{
@@ -28,6 +33,11 @@ export interface UserDoc extends mongoose.Document{
     customerId: string;
     subscriptionId: string;
     createdDate: Date;
+    confirm_codes: [{
+        typeOfCode: ConfirmCodeTypes,
+        value: string,
+        expires_at: Date
+    }];
 }
 
 interface UserModel extends mongoose.Model<UserDoc> {
@@ -38,6 +48,10 @@ export enum UserRoles {
     GUEST = 'guest',
     USER = 'user',
     PAID_USER = 'paid_user'
+}
+
+export enum ConfirmCodeTypes {
+    RESET_PASSWORD = 'reset_password'
 }
 
 const userSchema = new mongoose.Schema<UserDoc>({
@@ -69,7 +83,15 @@ const userSchema = new mongoose.Schema<UserDoc>({
     subscriptionId: String,
     registerData: Date,
     paymentDate: Date,
-    paymentExpirationDate: Date
+    paymentExpirationDate: Date,
+    confirm_codes: [{
+        typeOfCode: {
+            type: String,
+            enum: ConfirmCodeTypes
+        },
+        value: String,
+        expires_at: Date
+    }]
 }, {
     toJSON: {
         transform(doc, ret) {

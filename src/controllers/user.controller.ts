@@ -1,10 +1,17 @@
 import { Response, Request } from 'express';
-import { User, UserRoles } from '../models/user.model';
+import { ConfirmCodeTypes, User, UserRoles } from '../models/user.model';
 import jwt from 'jsonwebtoken';
 import { configs } from '../config';
 import moment from 'moment';
+import bcrypt from 'bcryptjs';
 import { StripeController } from './stripe.controller';
+import { UserCodeService } from '../services/user-code.service';
+import { MailClient } from '../services/mailer/mail.client';
+import { MailService } from '../services/mailer/mail.service';
+
+const userCodeService = new UserCodeService();
 const stripeController = new StripeController();
+const mailService = new MailService({ MailClient: new MailClient({ configs })});
 
 export class UserController {
 
@@ -26,8 +33,9 @@ export class UserController {
                 paymentExpirationDate: user.paymentExpirationDate || '',
                 customerId: user.customerId || ''
             });
-        } catch (err) {
-            console.log(err);
+        } catch (error) {
+            console.log(error);
+            return res.status(500).send(error);
         }
 
     }
@@ -84,6 +92,78 @@ export class UserController {
             return res.status(200).send(user);
         } catch (error) {
             console.log(error);
+            return res.status(500).send(error);
+        }
+    }
+
+    async getResetPasswordLink(req: Request, res: Response): Promise<any> {
+        try {
+            const email = req.body.email || '';
+
+            if (!email) {
+                return res.status(400).send('Email is required.');
+            }
+
+            const user = await User.findOne({ email });
+
+            if (!user) {
+                return res.status(404).send('User not found.');
+            }
+
+            const confirmCode = await userCodeService.generateCode(user, ConfirmCodeTypes.RESET_PASSWORD);
+
+            if (!confirmCode) {
+                return res.status(500).send('Something went wrong');
+            }
+
+            await mailService.sendResetPasswordEmail(user.email, {
+                link: `${configs.landingUrl}/forgot-password?reset_password_key=${confirmCode.value}`
+            });
+
+            return res.status(200).send();
+        } catch (error) {
+            console.log(error);
+            return res.status(500).send(error);
+        }
+    }
+
+    async resetUserPassword(req: Request, res: Response): Promise<any> {
+        try {
+            const code = req.params.code
+            const password = req.body.password;
+
+            if (!code) {
+                return res.status(400).send('Reset password code is required.');
+            }
+
+            if (!password) {
+                return res.status(400).send('New password is required.');
+            }
+
+            const user = await userCodeService.getUserByCode(code, ConfirmCodeTypes.RESET_PASSWORD);
+
+            if (!user) {
+                return res.status(404).send('User not found.');
+            }
+
+            const isCodeExpired = await userCodeService.isExpiredCode(user, ConfirmCodeTypes.RESET_PASSWORD);
+
+            if (isCodeExpired) {
+                return res.status(400).send('Reset password code is already expired.');
+            }
+
+            const encryptedPassword = await bcrypt.hash(password, 10);
+
+            user.password = encryptedPassword;
+
+            await user.save();
+
+            await userCodeService.removeCode(user, ConfirmCodeTypes.RESET_PASSWORD);
+
+            return res.status(200).send({});
+        } catch (error) {
+            console.log(error);
+            return res.status(500).send(error);
         }
     }
 }

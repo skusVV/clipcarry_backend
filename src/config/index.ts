@@ -22,5 +22,11 @@ export const configs: IConfigs = {
 
   guestUserPassword: process.env.GUEST_USER_PASSWORD || '',
   registrationPromoCode: process.env.REGISTRATION_PROMOCODE || '',
-  landingUrl: process.env.LANDING_URL || ''
+  landingUrl: process.env.LANDING_URL || '',
+
+  nodemailer: {
+    service: process.env.NODEMAILER_SERVICE || '',
+    email: process.env.NODEMAILER_EMAIL || '',
+    pass: process.env.NODEMAILER_PASS || ''
+  },
 };

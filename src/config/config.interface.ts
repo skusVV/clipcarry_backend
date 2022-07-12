@@ -13,4 +13,9 @@ export interface IConfigs {
   guestUserPassword: string;
   registrationPromoCode: string;
   landingUrl: string;
+  nodemailer: {
+    service: string;
+    email: string;
+    pass: string;
+  };
 }

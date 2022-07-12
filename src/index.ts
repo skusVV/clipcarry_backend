@@ -2,6 +2,7 @@ import express, { Express } from 'express';
 import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
 import cors from 'cors';
+import ejs from 'ejs';
 
 import { authRoutes } from './routes/auth';
 import { userRoutes } from './routes/user';
@@ -16,6 +17,9 @@ const app: Express = express();
 
 app.use(cors());
 app.use(bodyParser.json());
+
+app.engine('html', ejs.renderFile);
+app.set('view engine', 'html');
 
 authRoutes(app);
 userRoutes(app);
