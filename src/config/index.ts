@@ -24,9 +24,8 @@ export const configs: IConfigs = {
   registrationPromoCode: process.env.REGISTRATION_PROMOCODE || '',
   landingUrl: process.env.LANDING_URL || '',
 
-  nodemailer: {
-    service: process.env.NODEMAILER_SERVICE || '',
-    email: process.env.NODEMAILER_EMAIL || '',
-    pass: process.env.NODEMAILER_PASS || ''
-  },
+  sendgrid: {
+    secret: process.env.SENDGRID_SECRET || '',
+    email: process.env.SENDGRID_EMAIL || ''
+  }
 };

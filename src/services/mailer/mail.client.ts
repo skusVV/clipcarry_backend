@@ -1,13 +1,11 @@
 import {
   EmailResponse,
-  IMailInputData,
-  ITransportConfig,
-  TransportResponse,
+  IMailInputData
 } from './mail.interface';
 
-import nodemailer from 'nodemailer';
 import { IConfigs } from '../../config/config.interface';
 import { configs } from '../../config';
+const sgMail = require('@sendgrid/mail')
 
 export interface IMailClientProps {
   configs: IConfigs;
@@ -18,45 +16,25 @@ export interface IMailClient {
 }
 
 export class MailClient implements IMailClient {
-  private transportConfig: ITransportConfig;
 
   constructor({ configs }: IMailClientProps) {
-    this.transportConfig = {
-      service: configs.nodemailer.service,
-      auth: {
-        user: configs.nodemailer.email,
-        pass: configs.nodemailer.pass
-      }
-    };
+    sgMail.setApiKey(configs.sendgrid.secret);
   }
 
   public async send({
-    from = configs.nodemailer.email,
+    from = configs.sendgrid.email,
     to = '',
     subject = '',
     html = '',
     text = '',
   }: IMailInputData): EmailResponse {
     try {
-      const transport = await this.createSMTPTransport();
-      const sentMailInfo = await transport.sendMail({ from, to, subject, html, text });
+      const sentMailInfo = await sgMail.send({ from, to, subject, html, text });
 
       return sentMailInfo;
     } catch (error) {
       console.log('Cannot send email: ', error);
       throw new Error('Cannot send email');
-    }
-  }
-
-  private async createSMTPTransport(): TransportResponse {
-    try {
-      const transports = nodemailer.createTransport(this.transportConfig);
-      await transports.verify();
-
-      return transports;
-    } catch (error) {
-      console.log('Cannot create SMTP transport: ', error);
-      throw new Error('Cannot create SMTP transport');
     }
   }
 
