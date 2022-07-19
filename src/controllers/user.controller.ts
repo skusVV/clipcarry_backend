@@ -116,8 +116,12 @@ export class UserController {
                 return res.status(500).send('Something went wrong');
             }
 
+            const resetLink = `${configs.landingUrl}/forgot-password?reset_password_key=${confirmCode.value}`;
+
+            console.log('Reset link: ', resetLink);
+
             await mailService.sendResetPasswordEmail(user.email, {
-                link: `${configs.landingUrl}/forgot-password?reset_password_key=${confirmCode.value}`
+                link: resetLink
             });
 
             return res.status(200).send();
@@ -159,6 +163,38 @@ export class UserController {
             await user.save();
 
             await userCodeService.removeCode(user, ConfirmCodeTypes.RESET_PASSWORD);
+
+            return res.status(200).send({});
+        } catch (error) {
+            console.log(error);
+            return res.status(500).send(error);
+        }
+    }
+
+    async changeUserPassword(req: Request, res: Response): Promise<any> {
+        try {
+            const { old_password, new_password } = req.body;
+            const { user_id } = (req as any).user;
+
+            const user = await User.findById(user_id);
+
+            if (!old_password || !new_password) {
+                return res.status(400).send('All fields are required');
+            }
+
+            if (!user) {
+                return res.status(404).send('User not found');
+            }
+
+            if (!(await bcrypt.compare(old_password, user.password))) {
+                return res.status(400).send('Invalid password');
+            }
+
+            const encryptedNewPassword = await bcrypt.hash(new_password, 10);
+
+            user.password = encryptedNewPassword;
+
+            await user.save();
 
             return res.status(200).send({});
         } catch (error) {

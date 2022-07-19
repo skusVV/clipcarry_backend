@@ -20,4 +20,8 @@ export const userRoutes = (app: any) => {
     app.patch('/api/password/:code', (req: Request, res: Response) => {
         return userController.resetUserPassword(req, res);
     });
+
+    app.patch('/api/user/password', auth, (req: Request, res: Response) => {
+        return userController.changeUserPassword(req, res);
+    });
 }
