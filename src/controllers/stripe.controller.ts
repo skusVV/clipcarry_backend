@@ -88,7 +88,7 @@ export class StripeController {
 
     const portal = await stripe.billingPortal.sessions.create({
       customer: customerId,
-      return_url: configs.landingUrl,
+      return_url: `${configs.landingUrl}/settings`,
     });
 
     res.send({
