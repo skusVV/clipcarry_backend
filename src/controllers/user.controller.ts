@@ -8,6 +8,7 @@ import { StripeController } from './stripe.controller';
 import { UserCodeService } from '../services/user-code.service';
 import { MailClient } from '../services/mailer/mail.client';
 import { MailService } from '../services/mailer/mail.service';
+import { PROMO_USER_SUB_ID } from '../constants';
 
 const userCodeService = new UserCodeService();
 const stripeController = new StripeController();
@@ -31,7 +32,8 @@ export class UserController {
                 role: user.role,
                 userGuid: user_id,
                 paymentExpirationDate: user.paymentExpirationDate || '',
-                customerId: user.customerId || ''
+                customerId: user.customerId || '',
+                isInvitedUser: user.subscriptionId === PROMO_USER_SUB_ID
             });
         } catch (error) {
             console.log(error);
