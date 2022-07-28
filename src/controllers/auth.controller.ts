@@ -31,7 +31,7 @@ export class AuthController {
 
                 user.token = token;
 
-                return res.status(200).json({ token, userGuid: user._id, role: user.role });
+                return res.status(200).json({ token, userGuid: user._id, role: user.role, email: user.email });
             }
             res.status(400).send("Wrong password"); // A bit tricky, but it was Client requirement, so DILLIGAF
         } catch (err) {
